@@ -20,12 +20,10 @@ func TestCreate(t *testing.T) {
 
 // TestOpen test Open() function
 func TestOpen(t *testing.T) {
-	file, err := Open(filename)
+	_, err := Open(filename)
 	if err != nil {
 		t.Errorf("Open() error %v", err)
 	}
-
-	defer file.Close()
 }
 
 // TestRemove test Remove() function

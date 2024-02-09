@@ -58,6 +58,7 @@ func fileExists(name string) bool {
 	if err == nil {
 		return true
 	}
+
 	if os.IsNotExist(err) {
 		return false
 	}
@@ -80,5 +81,6 @@ func getHome() string {
 // of the home directory and the file name
 func fileName(name string) string {
 	name = getHome() + "/" + name
+
 	return name
 }
