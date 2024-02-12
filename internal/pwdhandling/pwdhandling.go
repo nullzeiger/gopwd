@@ -50,6 +50,20 @@ func All(file *os.File) []string {
 	return pwds
 }
 
+// Create writes a new password to the file otherwise an error
+func Create(file *os.File, pwd Pwd) error {
+	defer file.Close()
+
+	newPassword := fmt.Sprintf("%s,%s,%s,%s\n", pwd.Name, pwd.Username, pwd.Email, pwd.Password)
+
+	_, err := file.WriteString(newPassword)
+	if err != nil {
+		panic(err)
+	}
+
+	return nil
+}
+
 // Delete() deletes a line indicated by the key function parameter and returns true if successful
 func Delete(file *os.File, key int) bool {
 	defer file.Close()
@@ -114,18 +128,4 @@ func Search(file *os.File, key string) []string {
 	}
 
 	return pwds
-}
-
-// Write writes a new password to the file otherwise an error
-func Write(file *os.File, pwd Pwd) error {
-	defer file.Close()
-
-	newPassword := fmt.Sprintf("%s,%s,%s,%s\n", pwd.Name, pwd.Username, pwd.Email, pwd.Password)
-
-	_, err := file.WriteString(newPassword)
-	if err != nil {
-		panic(err)
-	}
-
-	return nil
 }
