@@ -22,14 +22,14 @@ type Pwd struct {
 }
 
 // All returns a slice of strings containing all the passwords
-func All(file *os.File) []string {
+func All(file *os.File) ([]string, error) {
 	defer file.Close()
 
 	reader := csv.NewReader(file)
 
 	records, err := reader.ReadAll()
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	pwds := make([]string, 0, len(records))
@@ -47,32 +47,32 @@ func All(file *os.File) []string {
 				i, pwd.Name, pwd.Username, pwd.Email, pwd.Password))
 	}
 
-	return pwds
+	return pwds, nil
 }
 
 // Create writes a new password to the file otherwise an error
-func Create(file *os.File, pwd Pwd) error {
+func Create(file *os.File, pwd Pwd) (int, error) {
 	defer file.Close()
 
 	newPassword := fmt.Sprintf("%s,%s,%s,%s\n", pwd.Name, pwd.Username, pwd.Email, pwd.Password)
 
-	_, err := file.WriteString(newPassword)
+	n, err := file.WriteString(newPassword)
 	if err != nil {
-		panic(err)
+		return 0, err
 	}
 
-	return nil
+	return n, nil
 }
 
 // Delete() deletes a line indicated by the key function parameter and returns true if successful
-func Delete(file *os.File, key int) bool {
+func Delete(file *os.File, key int) (bool, error) {
 	defer file.Close()
 
 	const tempFile = ".pwdTmp.csv"
 
 	fileTmp, err := os.CreateTemp("", tempFile)
 	if err != nil {
-		panic(err)
+		return false, err
 	}
 
 	defer os.Remove(file.Name())
@@ -86,7 +86,7 @@ func Delete(file *os.File, key int) bool {
 		if i != key {
 			_, err = fileTmp.WriteString(line + "\n")
 			if err != nil {
-				panic(err)
+				return false, err
 			}
 		}
 
@@ -95,26 +95,26 @@ func Delete(file *os.File, key int) bool {
 
 	err = scanner.Err()
 	if err != nil {
-		panic(err)
+		return false, err
 	}
 
 	err = os.Rename(tempFile, file.Name())
 	if err != nil {
-		panic(err)
+		return false, err
 	}
 
-	return true
+	return true, nil
 }
 
 // Search returns a slice with all the passwords found with the word used for the search
-func Search(file *os.File, key string) []string {
+func Search(file *os.File, key string) ([]string, error) {
 	defer file.Close()
 
 	reader := csv.NewReader(file)
 
 	records, err := reader.ReadAll()
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	pwds := make([]string, 0, len(records))
@@ -127,5 +127,5 @@ func Search(file *os.File, key string) []string {
 		}
 	}
 
-	return pwds
+	return pwds, nil
 }
