@@ -75,6 +75,7 @@ func Delete(file *os.File, key int) bool {
 				panic(err)
 			}
 		}
+
 		i++
 	}
 
