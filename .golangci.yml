@@ -1,4 +1,11 @@
 linters-settings:
+  depguard:
+    rules:
+      main:
+        allow:
+          - $gostd
+          - github.com/nullzeiger/gopwd/internal/filehandling
+          - github.com/nullzeiger/gopwd/internal/pwdhandling
   errcheck:
     check-type-assertions: true
   goconst:

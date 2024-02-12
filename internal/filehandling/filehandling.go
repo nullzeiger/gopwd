@@ -31,7 +31,7 @@ func Create(name string) error {
 func Open(name string) (*os.File, error) {
 	name = fileName(name)
 
-	file, err := os.Open(name)
+	file, err := os.OpenFile(name, os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.ModePerm)
 	if err != nil {
 		return nil, err
 	}
