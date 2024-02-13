@@ -68,14 +68,13 @@ func Create(file *os.File, pwd Pwd) (int, error) {
 func Delete(file *os.File, key int) (bool, error) {
 	defer file.Close()
 
-	const tempFile = ".pwdTmp.csv"
-
-	fileTmp, err := os.CreateTemp("", tempFile)
+	fileTemp, err := os.CreateTemp("", "pwdTemp.csv")
 	if err != nil {
 		return false, err
 	}
 
-	defer os.Remove(file.Name())
+	defer fileTemp.Close()
+	defer os.Remove(fileTemp.Name())
 
 	scanner := bufio.NewScanner(file)
 
@@ -83,8 +82,8 @@ func Delete(file *os.File, key int) (bool, error) {
 
 	for scanner.Scan() {
 		line := scanner.Text()
-		if i != key {
-			_, err = fileTmp.WriteString(line + "\n")
+		if i != (key - 1) {
+			_, err = fileTemp.WriteString(line + "\n")
 			if err != nil {
 				return false, err
 			}
@@ -98,7 +97,7 @@ func Delete(file *os.File, key int) (bool, error) {
 		return false, err
 	}
 
-	err = os.Rename(tempFile, file.Name())
+	err = os.Rename(fileTemp.Name(), file.Name())
 	if err != nil {
 		return false, err
 	}
