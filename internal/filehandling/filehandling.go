@@ -8,6 +8,8 @@ package filehandling
 
 import "os"
 
+const perm = 0o644
+
 // Create creates a file otherwise an error
 func Create(name string) error {
 	name = fileName(name)
@@ -31,7 +33,7 @@ func Create(name string) error {
 func Open(name string) (*os.File, error) {
 	name = fileName(name)
 
-	file, err := os.OpenFile(name, os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.ModePerm)
+	file, err := os.OpenFile(name, os.O_APPEND|os.O_CREATE|os.O_RDWR, perm)
 	if err != nil {
 		return nil, err
 	}

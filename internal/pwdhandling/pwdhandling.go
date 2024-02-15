@@ -15,10 +15,7 @@ import (
 
 // Structure that defines the fields for Pwd
 type Pwd struct {
-	Name     string
-	Username string
-	Email    string
-	Password string
+	Name, Username, Email, Password string
 }
 
 // All returns a slice of strings containing all the passwords

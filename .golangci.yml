@@ -6,6 +6,7 @@ linters-settings:
           - $gostd
           - github.com/nullzeiger/gopwd/internal/filehandling
           - github.com/nullzeiger/gopwd/internal/pwdhandling
+          - github.com/nullzeiger/gopwd/internal/argparse
   errcheck:
     check-type-assertions: true
   goconst:
