@@ -15,7 +15,7 @@ import (
 	ph "github.com/nullzeiger/gopwd/internal/pwdhandling"
 )
 
-const fileName = ".pwds.csv"
+const fileName = ".pwd.csv"
 
 func main() {
 	// Create file is not exist
@@ -89,7 +89,9 @@ func main() {
 			log.Fatal("Error search file", err)
 		}
 
-		fmt.Println(pwds)
+		for _, pwd := range pwds {
+			fmt.Println(pwd)
+		}
 
 		file.Close()
 

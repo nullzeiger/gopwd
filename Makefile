@@ -6,7 +6,7 @@
 BINARY_NAME=gopwd
 BINARY_PATH=build
 
-all: fmt  vet test lint
+all: fmt vet test lint build
 
 lint:
 	golangci-lint run --config .golangci.yml
