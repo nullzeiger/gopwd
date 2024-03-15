@@ -60,7 +60,6 @@ func main() {
 			log.Fatal("Error read file", err)
 		}
 
-		//		fmt.Println(pwds)
 		printSlice(pwds)
 
 		file.Close()
