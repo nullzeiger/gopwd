@@ -40,7 +40,7 @@ func All(file *os.File) ([]string, error) {
 		}
 
 		pwds = append(pwds,
-			fmt.Sprintf("[%d] Name: %s Username: %s Email: %s Password: %s\n",
+			fmt.Sprintf("[%d] Name: %s Username: %s Email: %s Password: %s",
 				i, pwd.Name, pwd.Username, pwd.Email, pwd.Password))
 	}
 

@@ -17,6 +17,13 @@ import (
 
 const fileName = ".pwd.csv"
 
+// Print slice
+func printSlice(s []string) {
+	for _, value := range s {
+		fmt.Printf("%v\n", value)
+	}
+}
+
 func main() {
 	// Create file is not exist
 	err := fh.Create(fileName)
@@ -53,7 +60,8 @@ func main() {
 			log.Fatal("Error read file", err)
 		}
 
-		fmt.Println(pwds)
+		//		fmt.Println(pwds)
+		printSlice(pwds)
 
 		file.Close()
 
