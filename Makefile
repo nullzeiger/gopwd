@@ -12,7 +12,7 @@ lint:
 	golangci-lint run --config .golangci.yml
 
 run:
-	go run ./...
+	go run ./... --all
 
 vet:
 	go vet ./...

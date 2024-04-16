@@ -1,0 +1,56 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_EXCMD	mixed	/number, pattern, mixed, or combineV2/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
+!_TAG_PROC_CWD	/home/ivan/development/golang/gopwd/	//
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	5.9.0	//
+All	internal/pwdhandling/pwdhandling.go	/^func All(file *os.File) ([]string, error) {$/;"	f	package:pwdhandling	typeref:typename:([]string, error)
+BINARY_NAME	Makefile	/^BINARY_NAME=gopwd$/;"	m
+BINARY_PATH	Makefile	/^BINARY_PATH=build$/;"	m
+Create	internal/filehandling/filehandling.go	/^func Create(name string) error {$/;"	f	package:filehandling	typeref:typename:error
+Create	internal/pwdhandling/pwdhandling.go	/^func Create(file *os.File, pwd Pwd) (int, error) {$/;"	f	package:pwdhandling	typeref:typename:(int, error)
+Delete	internal/pwdhandling/pwdhandling.go	/^func Delete(file *os.File, key int) (bool, error) {$/;"	f	package:pwdhandling	typeref:typename:(bool, error)
+Email	internal/pwdhandling/pwdhandling.go	/^	Name, Username, Email, Password string$/;"	m	struct:pwdhandling.Pwd	typeref:typename:string
+Name	internal/pwdhandling/pwdhandling.go	/^	Name, Username, Email, Password string$/;"	m	struct:pwdhandling.Pwd	typeref:typename:string
+Open	internal/filehandling/filehandling.go	/^func Open(name string) (*os.File, error) {$/;"	f	package:filehandling	typeref:typename:(*os.File, error)
+Password	internal/pwdhandling/pwdhandling.go	/^	Name, Username, Email, Password string$/;"	m	struct:pwdhandling.Pwd	typeref:typename:string
+Pwd	internal/pwdhandling/pwdhandling.go	/^type Pwd struct {$/;"	s	package:pwdhandling
+Remove	internal/filehandling/filehandling.go	/^func Remove(name string) error {$/;"	f	package:filehandling	typeref:typename:error
+Search	internal/pwdhandling/pwdhandling.go	/^func Search(file *os.File, key string) ([]string, error) {$/;"	f	package:pwdhandling	typeref:typename:([]string, error)
+TestAll	internal/pwdhandling/pwdhandling_test.go	/^func TestAll(t *testing.T) {$/;"	f	package:pwdhandling
+TestCreate	internal/filehandling/filehandling_test.go	/^func TestCreate(t *testing.T) {$/;"	f	package:filehandling
+TestCreate	internal/pwdhandling/pwdhandling_test.go	/^func TestCreate(t *testing.T) {$/;"	f	package:pwdhandling
+TestDelete	internal/pwdhandling/pwdhandling_test.go	/^func TestDelete(t *testing.T) {$/;"	f	package:pwdhandling
+TestOpen	internal/filehandling/filehandling_test.go	/^func TestOpen(t *testing.T) {$/;"	f	package:filehandling
+TestRemove	internal/filehandling/filehandling_test.go	/^func TestRemove(t *testing.T) {$/;"	f	package:filehandling
+TestSearch	internal/pwdhandling/pwdhandling_test.go	/^func TestSearch(t *testing.T) {$/;"	f	package:pwdhandling
+Username	internal/pwdhandling/pwdhandling.go	/^	Name, Username, Email, Password string$/;"	m	struct:pwdhandling.Pwd	typeref:typename:string
+all	Makefile	/^all: fmt vet test lint build$/;"	t
+build	Makefile	/^build:$/;"	t
+clean	Makefile	/^clean:$/;"	t
+fh	cmd/gopwd/main.go	/^	fh "github.com\/nullzeiger\/gopwd\/internal\/filehandling"$/;"	P	package:github.com/nullzeiger/gopwd/internal/filehandling
+fileExists	internal/filehandling/filehandling.go	/^func fileExists(name string) bool {$/;"	f	package:filehandling	typeref:typename:bool
+fileName	cmd/gopwd/main.go	/^const fileName = ".pwd.csv"$/;"	c	package:main
+fileName	internal/filehandling/filehandling.go	/^func fileName(name string) string {$/;"	f	package:filehandling	typeref:typename:string
+filehandling	internal/filehandling/filehandling.go	/^package filehandling$/;"	p
+filehandling	internal/filehandling/filehandling_test.go	/^package filehandling$/;"	p
+filename	internal/filehandling/filehandling_test.go	/^const filename = "gopwdtestfile"$/;"	c	package:filehandling
+fmt	Makefile	/^fmt:$/;"	t
+getHome	internal/filehandling/filehandling.go	/^func getHome() string {$/;"	f	package:filehandling	typeref:typename:string
+gopwd	README.md	/^# gopwd$/;"	c
+lint	Makefile	/^lint:$/;"	t
+main	cmd/gopwd/main.go	/^func main() {$/;"	f	package:main
+main	cmd/gopwd/main.go	/^package main$/;"	p
+perm	internal/filehandling/filehandling.go	/^const perm = 0o644$/;"	c	package:filehandling
+ph	cmd/gopwd/main.go	/^	ph "github.com\/nullzeiger\/gopwd\/internal\/pwdhandling"$/;"	P	package:github.com/nullzeiger/gopwd/internal/pwdhandling
+printSlice	cmd/gopwd/main.go	/^func printSlice(s []string) {$/;"	f	package:main
+pwdhandling	internal/pwdhandling/pwdhandling.go	/^package pwdhandling$/;"	p
+pwdhandling	internal/pwdhandling/pwdhandling_test.go	/^package pwdhandling$/;"	p
+run	Makefile	/^run:$/;"	t
+test	Makefile	/^test:$/;"	t
+vet	Makefile	/^vet:$/;"	t

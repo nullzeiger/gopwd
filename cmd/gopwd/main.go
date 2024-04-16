@@ -19,8 +19,8 @@ const fileName = ".pwd.csv"
 
 // Print slice
 func printSlice(s []string) {
-	for _, value := range s {
-		fmt.Printf("%v\n", value)
+	for _, pwd := range s {
+		fmt.Printf("%v\n", pwd)
 	}
 }
 
