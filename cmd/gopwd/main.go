@@ -15,7 +15,7 @@ import (
 	ph "github.com/nullzeiger/gopwd/internal/pwdhandling"
 )
 
-const fileName = ".pwd.csv"
+const fileName = ".pwds.csv"
 
 // Print slice
 func printSlice(s []string) {
