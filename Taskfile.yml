@@ -1,0 +1,35 @@
+# Copyright 2024 Ivan Guerreschi <ivan.guerreschi.dev@gmail.com>.
+# All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+version: '3'
+
+tasks:
+  lint:
+    cmds:
+      - golangci-lint run --config .golanggci.yml
+
+  run:
+    cmds:
+      - go run ./...
+
+  vet:
+    cmds:
+      - go vet ./...
+
+  fmt:
+    cmds:
+      - gofmt -d -e -s -w .
+
+  test:
+    cmds:
+      - go test -v ./...
+
+  build:
+    cmds:
+      - go build -o build/gopwd cmd/gopwd/main.go
+
+  clean:
+    cmds:
+      - rm -rf build      

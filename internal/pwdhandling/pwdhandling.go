@@ -118,7 +118,7 @@ func Search(file *os.File, key string) ([]string, error) {
 	for i, item := range records {
 		if key == item[0] || key == item[1] || key == item[2] || key == item[3] {
 			pwds = append(pwds,
-				fmt.Sprintf("[%d] Name: %s Username: %s Email: %s Password: %s\n",
+				fmt.Sprintf("[%d] Name: %s Username: %s Email: %s Password: %s",
 					i, item[0], item[1], item[2], item[3]))
 		}
 	}
