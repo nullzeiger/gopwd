@@ -8,7 +8,7 @@ version: '3'
 tasks:
   lint:
     cmds:
-      - golangci-lint run --config .golanggci.yml
+      - golangci-lint run --config .golangci.yml
 
   run:
     cmds:
