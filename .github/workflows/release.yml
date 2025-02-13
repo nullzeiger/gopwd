@@ -24,7 +24,7 @@ jobs:
         name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: 1.23.4
+          go-version: 1.24
 
       -
         name: Run GoReleaser
@@ -33,6 +33,6 @@ jobs:
           distribution: goreleaser
           version: latest
           args: release --clean
-          workdir: ./cmd/gopwd
+          workdir: .
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
