@@ -10,7 +10,9 @@ import (
 	"bufio"
 	"encoding/csv"
 	"fmt"
+	"io"
 	"os"
+	"strings"
 )
 
 // Structure that defines the fields for Pwd
@@ -102,24 +104,31 @@ func Delete(file *os.File, key int) (bool, error) {
 	return true, nil
 }
 
-// Search returns a slice with all the passwords found with the word used for the search
+// Search returns a slice with all the passwords found with the word used for the search.
+// It searches across multiple columns (Name, Username, Email, Password) and is case-insensitive.
 func Search(file *os.File, key string) ([]string, error) {
 	defer file.Close()
 
 	reader := csv.NewReader(file)
 
-	records, err := reader.ReadAll()
-	if err != nil {
-		return nil, err
-	}
+	pwds := []string{}
 
-	pwds := make([]string, 0, len(records))
+	for i := 0; ; i++ {
+		record, err := reader.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
 
-	for i, item := range records {
-		if key == item[0] || key == item[1] || key == item[2] || key == item[3] {
-			pwds = append(pwds,
-				fmt.Sprintf("[%d] Name: %s Username: %s Email: %s Password: %s",
-					i, item[0], item[1], item[2], item[3]))
+		for _, field := range record {
+			if strings.ToLower(field) == strings.ToLower(key) {
+				pwds = append(pwds,
+					fmt.Sprintf("[%d] Name: %s Username: %s Email: %s Password: %s",
+						i, record[0], record[1], record[2], record[3]))
+				break
+			}
 		}
 	}
 
