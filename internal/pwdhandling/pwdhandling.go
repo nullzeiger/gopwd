@@ -118,7 +118,10 @@ func Search(file *os.File, key string) ([]string, error) {
 	}
 
 	for i, field := range records {
-		if strings.EqualFold(strings.ToLower(key), strings.ToLower(field[0])) || strings.EqualFold(strings.ToLower(key), strings.ToLower(field[1])) || strings.EqualFold(strings.ToLower(key), strings.ToLower(field[2])) || strings.EqualFold(strings.ToLower(key), strings.ToLower(field[3])) {
+		if strings.EqualFold(strings.ToLower(key), strings.ToLower(field[0])) ||
+			strings.EqualFold(strings.ToLower(key), strings.ToLower(field[1])) ||
+			strings.EqualFold(strings.ToLower(key), strings.ToLower(field[2])) ||
+			strings.EqualFold(strings.ToLower(key), strings.ToLower(field[3])) {
 			pwds = append(pwds,
 				fmt.Sprintf("[%d] Name: %s Username: %s Email: %s Password: %s",
 					i, field[0], field[1], field[2], field[3]))
