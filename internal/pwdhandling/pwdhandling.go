@@ -10,7 +10,6 @@ import (
 	"bufio"
 	"encoding/csv"
 	"fmt"
-	"io"
 	"os"
 	"strings"
 )
@@ -113,22 +112,16 @@ func Search(file *os.File, key string) ([]string, error) {
 
 	pwds := []string{}
 
-	for i := 0; ; i++ {
-		record, err := reader.Read()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return nil, err
-		}
+	records, err := reader.ReadAll()
+	if err != nil {
+		return nil, err
+	}
 
-		for _, field := range record {
-			if strings.ToLower(field) == strings.ToLower(key) {
-				pwds = append(pwds,
-					fmt.Sprintf("[%d] Name: %s Username: %s Email: %s Password: %s",
-						i, record[0], record[1], record[2], record[3]))
-				break
-			}
+	for i, field := range records {
+		if strings.EqualFold(strings.ToLower(key), strings.ToLower(field[0])) || strings.EqualFold(strings.ToLower(key), strings.ToLower(field[1])) || strings.EqualFold(strings.ToLower(key), strings.ToLower(field[2])) || strings.EqualFold(strings.ToLower(key), strings.ToLower(field[3])) {
+			pwds = append(pwds,
+				fmt.Sprintf("[%d] Name: %s Username: %s Email: %s Password: %s",
+					i, field[0], field[1], field[2], field[3]))
 		}
 	}
 
