@@ -1,88 +1,77 @@
-// Copyright 2025 Ivan Guerreschi <ivan.guerreschi.dev@gmail.com>.
+// Copyright 2025 Ivan Guerreschi <ivan.guerreschi.dev@gmail.com>
 // All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package containing file handling functions
+// Package filehandling contains utility functions for managing files.
 package filehandling
 
-import "os"
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+)
 
-const perm = 0o644
+const filePerm = 0o644
 
-// Create creates a file otherwise an error
+// Create ensures the file exists in the user's home directory.
+// If it does not exist, it creates it.
 func Create(name string) error {
-	name = fileName(name)
+	fullPath := fullPath(name)
 
-	exist := fileExists(name)
-	if exist {
+	if fileExists(fullPath) {
 		return nil
 	}
 
-	file, err := os.Create(name)
+	file, err := os.Create(fullPath)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to create file: %w", err)
 	}
-
 	defer file.Close()
 
 	return nil
 }
 
-// Open opens a file and returns File for subsequent I/O operations or an error
+// Open opens a file in append+read-write mode and creates it if it doesn't exist.
 func Open(name string) (*os.File, error) {
-	name = fileName(name)
+	fullPath := fullPath(name)
 
-	file, err := os.OpenFile(name, os.O_APPEND|os.O_CREATE|os.O_RDWR, perm)
+	file, err := os.OpenFile(fullPath, os.O_APPEND|os.O_CREATE|os.O_RDWR, filePerm)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to open file: %w", err)
 	}
 
 	return file, nil
 }
 
-// Remove removes a file otherwise returns an error
+// Remove deletes the file from the home directory.
 func Remove(name string) error {
-	name = fileName(name)
+	fullPath := fullPath(name)
 
-	err := os.Remove(name)
-	if err != nil {
-		return err
+	if err := os.Remove(fullPath); err != nil {
+		return fmt.Errorf("failed to remove file: %w", err)
 	}
 
 	return nil
 }
 
-// fileExists returns a boolean true if the file exists
-// otherwise false if it does not exist
-func fileExists(name string) bool {
-	_, err := os.Stat(name)
-	if err == nil {
-		return true
-	}
-
-	if os.IsNotExist(err) {
-		return false
-	}
-
-	return false
+// fileExists returns true if the file exists, false otherwise.
+func fileExists(path string) bool {
+	_, err := os.Stat(path)
+	return err == nil
 }
 
-// getHome returns a string with the value of the home directory
-// otherwise a panic
-func getHome() string {
+// getHomeDir returns the user's home directory or panics if it cannot be determined.
+func getHomeDir() string {
 	home, err := os.UserHomeDir()
 	if err != nil {
-		panic(err)
+		panic("unable to determine user home directory: " + err.Error())
 	}
-
 	return home
 }
 
-// fileName returns a string with the concatenated value
-// of the home directory and the file name
-func fileName(name string) string {
-	name = getHome() + "/" + name
-
-	return name
+// fullPath returns the absolute path of the file in the user's home directory.
+func fullPath(name string) string {
+	return filepath.Join(getHomeDir(), name)
 }
+
