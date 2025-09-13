@@ -1,4 +1,4 @@
-// Copyright 2025 Ivan Guerreschi <ivan.guerreschi.dev@gmail.com>.
+// Copyright 2025 Ivan Guerreschi
 // All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
@@ -11,112 +11,120 @@ import (
 	"testing"
 )
 
-// TestAll test All() function
-func TestAll(t *testing.T) {
+// helper per creare un file temporaneo e rimuoverlo al termine
+func tempFile(t *testing.T) *os.File {
+	t.Helper()
 	file, err := os.CreateTemp("", "pwdhandlingtest.csv")
 	if err != nil {
-		panic(err)
+		t.Fatalf("cannot create temp file: %v", err)
 	}
+	t.Cleanup(func() {
+		file.Close()
+		os.Remove(file.Name())
+	})
+	return file
+}
 
-	defer file.Close()
-	defer os.Remove(file.Name())
+// TestAll tests All() function
+func TestAll(t *testing.T) {
+	file := tempFile(t)
 
 	pwd := Pwd{"Google", "mr", "mario.rossi@google.com", "1234"}
-
-	_, err = Create(file, pwd)
-	if err != nil {
-		panic(err)
+	if err := Create(file, pwd); err != nil {
+		t.Fatalf("Create() failed: %v", err)
 	}
 
-	file, err = os.Open(file.Name())
+	// Ri-apro il file in lettura
+	file.Close()
+	file, err := os.Open(file.Name())
 	if err != nil {
-		panic(err)
+		t.Fatalf("cannot reopen file: %v", err)
 	}
-
-	want := 1
+	defer file.Close()
 
 	got, err := All(file)
-	if err != nil || len(got) == 0 {
-		t.Errorf("All() error %v got %d wanted %d", err, len(got), want)
+	if err != nil {
+		t.Fatalf("All() error: %v", err)
+	}
+	if len(got) != 1 {
+		t.Errorf("All() got %d, want %d", len(got), 1)
 	}
 }
 
-// TestCreate test Create() function
+// TestCreate tests Create() function
 func TestCreate(t *testing.T) {
-	file, err := os.CreateTemp("", "pwdhandlingtest.csv")
-	if err != nil {
-		panic(err)
-	}
-
-	defer file.Close()
-	defer os.Remove(file.Name())
+	file := tempFile(t)
 
 	pwd := Pwd{"Google", "mr", "mario.rossi@google.com", "1234"}
+	if err := Create(file, pwd); err != nil {
+		t.Fatalf("Create() error: %v", err)
+	}
 
-	want := 1
+	// Check that it was really written
+	file.Close()
+	file, err := os.Open(file.Name())
+	if err != nil {
+		t.Fatalf("cannot reopen file: %v", err)
+	}
+	defer file.Close()
 
-	got, err := Create(file, pwd)
-	if err != nil || got <= want {
-		t.Errorf("Create() error %v got %x wanted %d", err, got, want)
+	records, err := All(file)
+	if err != nil {
+		t.Fatalf("All() error: %v", err)
+	}
+	if len(records) != 1 {
+		t.Errorf("Create() did not write record, got %d, want %d", len(records), 1)
 	}
 }
 
-// TestDelete test Delete() function
+// TestDelete tests Delete() function
 func TestDelete(t *testing.T) {
-	file, err := os.CreateTemp("", "pwdhandlingtest.csv")
-	if err != nil {
-		panic(err)
+	file := tempFile(t)
+
+	pwd := Pwd{"Google", "ff", "Fred.Flintstone.@google.com", "1234"}
+	if err := Create(file, pwd); err != nil {
+		t.Fatalf("Create() failed: %v", err)
 	}
 
+	// Reopen for delete
+	file.Close()
+	file, err := os.Open(file.Name())
+	if err != nil {
+		t.Fatalf("cannot reopen file: %v", err)
+	}
 	defer file.Close()
-	defer os.Remove(file.Name())
 
-	pwd1 := Pwd{"Google", "ff", "Fred.Flintstone.@google.com", "1234"}
-
-	_, err = Create(file, pwd1)
+	got, err := Delete(file, 0)
 	if err != nil {
-		panic(err)
+		t.Fatalf("Delete() error: %v", err)
 	}
-
-	file, err = os.Open(file.Name())
-	if err != nil {
-		panic(err)
-	}
-
-	want := true
-
-	got, err := Delete(file, 1)
-	if err != nil || got != want {
-		t.Errorf("Search() error %v got %t wanted %t", err, got, want)
+	if !got {
+		t.Errorf("Delete() got %t, want %t", got, true)
 	}
 }
 
-// TestSearch test Search() function
+// TestSearch tests Search() function
 func TestSearch(t *testing.T) {
-	file, err := os.CreateTemp("", "pwdhandlingtest.csv")
-	if err != nil {
-		panic(err)
+	file := tempFile(t)
+
+	pwd := Pwd{"Google", "ff", "Fred.Flintstone.@google.com", "1234"}
+	if err := Create(file, pwd); err != nil {
+		t.Fatalf("Create() failed: %v", err)
 	}
 
+	// Reopen for search
+	file.Close()
+	file, err := os.Open(file.Name())
+	if err != nil {
+		t.Fatalf("cannot reopen file: %v", err)
+	}
 	defer file.Close()
-	defer os.Remove(file.Name())
-
-	pwd1 := Pwd{"Google", "ff", "Fred.Flintstone.@google.com", "1234"}
-
-	_, err = Create(file, pwd1)
-	if err != nil {
-		panic(err)
-	}
-
-	file, err = os.Open(file.Name())
-	if err != nil {
-		panic(err)
-	}
-
-	want := 1
 
 	got, err := Search(file, "ff")
-	if err != nil || len(got) < want {
-		t.Errorf("Search() error %v got %d wanted %d", err, len(got), want)
+	if err != nil {
+		t.Fatalf("Search() error: %v", err)
+	}
+	if len(got) < 1 {
+		t.Errorf("Search() got %d, want at least %d", len(got), 1)
 	}
 }

@@ -1,8 +1,3 @@
-// Copyright 2025 Ivan Guerreschi <ivan.guerreschi.dev@gmail.com>.
-// All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
 package main
 
 import (
@@ -23,6 +18,16 @@ func printSlice(s []string) {
 	}
 }
 
+// withFile is a helper to open a file and pass it to a function.
+func withFile(path string, fn func(*os.File) error) error {
+	file, err := fh.Open(path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	return fn(file)
+}
+
 func main() {
 	// Ensure the file exists
 	if err := fh.Create(fileName); err != nil {
@@ -33,7 +38,6 @@ func main() {
 		log.Fatal("Expected 'all', 'create', 'delete', or 'search' command")
 	}
 
-	// Subcommand parsing
 	switch os.Args[1] {
 	case "all":
 		handleAll()
@@ -49,41 +53,37 @@ func main() {
 }
 
 func handleAll() {
-	file, err := fh.Open(fileName)
-	if err != nil {
-		log.Fatalf("Error opening file: %v", err)
+	if err := withFile(fileName, func(file *os.File) error {
+		pwds, err := ph.All(file)
+		if err != nil {
+			return err
+		}
+		printSlice(pwds)
+		return nil
+	}); err != nil {
+		log.Fatalf("Error: %v", err)
 	}
-	defer file.Close()
-
-	pwds, err := ph.All(file)
-	if err != nil {
-		log.Fatalf("Error reading passwords: %v", err)
-	}
-
-	printSlice(pwds)
 }
 
 func handleDelete() {
 	deleteFlag := flag.NewFlagSet("delete", flag.ExitOnError)
-	index := deleteFlag.Int("index", 0, "Index of password to delete")
+	index := deleteFlag.Int("index", -1, "Index of password to delete")
 	deleteFlag.Parse(os.Args[2:])
 
-	if *index <= 0 {
-		log.Fatal("Please provide a valid index to delete (greater than 0)")
+	if *index < 0 {
+		log.Fatal("Please provide a valid index (>= 0)")
 	}
 
-	file, err := fh.Open(fileName)
-	if err != nil {
-		log.Fatalf("Error opening file: %v", err)
+	if err := withFile(fileName, func(file *os.File) error {
+		ok, err := ph.Delete(file, *index)
+		if err != nil {
+			return err
+		}
+		fmt.Println("Deleted:", ok)
+		return nil
+	}); err != nil {
+		log.Fatalf("Error: %v", err)
 	}
-	defer file.Close()
-
-	result, err := ph.Delete(file, *index)
-	if err != nil {
-		log.Fatalf("Error deleting password: %v", err)
-	}
-
-	fmt.Println(result)
 }
 
 func handleSearch() {
@@ -95,18 +95,16 @@ func handleSearch() {
 		log.Fatal("Please provide a search query using --query")
 	}
 
-	file, err := fh.Open(fileName)
-	if err != nil {
-		log.Fatalf("Error opening file: %v", err)
+	if err := withFile(fileName, func(file *os.File) error {
+		pwds, err := ph.Search(file, *query)
+		if err != nil {
+			return err
+		}
+		printSlice(pwds)
+		return nil
+	}); err != nil {
+		log.Fatalf("Error: %v", err)
 	}
-	defer file.Close()
-
-	pwds, err := ph.Search(file, *query)
-	if err != nil {
-		log.Fatalf("Error searching passwords: %v", err)
-	}
-
-	printSlice(pwds)
 }
 
 func handleCreate(args []string) {
@@ -121,26 +119,19 @@ func handleCreate(args []string) {
 		log.Fatal("All fields --name, --username, --email, and --password are required")
 	}
 
-	file, err := fh.Open(fileName)
-	if err != nil {
-		log.Fatalf("Error opening file: %v", err)
-	}
-	defer file.Close()
-
-	pwd := ph.Pwd{
-		Name:     *name,
-		Username: *username,
-		Email:    *email,
-		Password: *password,
-	}
-
-	n, err := ph.Create(file, pwd)
-	if err != nil {
-		log.Fatalf("Error creating password: %v", err)
-	}
-
-	if n > 0 {
+	if err := withFile(fileName, func(file *os.File) error {
+		pwd := ph.Pwd{
+			Name:     *name,
+			Username: *username,
+			Email:    *email,
+			Password: *password,
+		}
+		if err := ph.Create(file, pwd); err != nil {
+			return err
+		}
 		fmt.Println("Password created successfully")
+		return nil
+	}); err != nil {
+		log.Fatalf("Error: %v", err)
 	}
 }
-

@@ -1,132 +1,122 @@
-// Copyright 2025 Ivan Guerreschi <ivan.guerreschi.dev@gmail.com>.
+// Copyright 2025 Ivan Guerreschi
 // All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package containing password handling functions
+// Package pwdhandling contains password handling functions
 package pwdhandling
 
 import (
-	"bufio"
 	"encoding/csv"
 	"fmt"
 	"os"
 	"strings"
 )
 
-// Structure that defines the fields for Pwd
+// Pwd represents a single password entry.
 type Pwd struct {
 	Name, Username, Email, Password string
 }
 
-// All returns a slice of strings containing all the passwords
+// formatPwd returns a human-readable string for a password entry.
+func formatPwd(index int, p Pwd) string {
+	return fmt.Sprintf("[%d] Name: %s Username: %s Email: %s Password: %s",
+		index, p.Name, p.Username, p.Email, p.Password)
+}
+
+// All returns a slice of strings containing all the passwords.
 func All(file *os.File) ([]string, error) {
-	defer file.Close()
-
 	reader := csv.NewReader(file)
-
 	records, err := reader.ReadAll()
 	if err != nil {
 		return nil, err
 	}
 
 	pwds := make([]string, 0, len(records))
-
 	for i, item := range records {
-		pwd := Pwd{
-			Name:     item[0],
-			Username: item[1],
-			Email:    item[2],
-			Password: item[3],
+		if len(item) < 4 {
+			continue // skip malformed rows
 		}
-
-		pwds = append(pwds,
-			fmt.Sprintf("[%d] Name: %s Username: %s Email: %s Password: %s",
-				i, pwd.Name, pwd.Username, pwd.Email, pwd.Password))
+		pwd := Pwd{item[0], item[1], item[2], item[3]}
+		pwds = append(pwds, formatPwd(i, pwd))
 	}
 
 	return pwds, nil
 }
 
-// Create writes a new password to the file otherwise an error
-func Create(file *os.File, pwd Pwd) (int, error) {
-	defer file.Close()
+// Create appends a new password to the file.
+func Create(file *os.File, pwd Pwd) error {
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
 
-	newPassword := fmt.Sprintf("%s,%s,%s,%s\n", pwd.Name, pwd.Username, pwd.Email, pwd.Password)
-
-	n, err := file.WriteString(newPassword)
-	if err != nil {
-		return 0, err
+	record := []string{pwd.Name, pwd.Username, pwd.Email, pwd.Password}
+	if err := writer.Write(record); err != nil {
+		return err
 	}
-
-	return n, nil
+	return nil
 }
 
-// Delete() deletes a line indicated by the key function parameter and returns true if successful
+// Delete removes a row by index and rewrites the file.
 func Delete(file *os.File, key int) (bool, error) {
-	defer file.Close()
-
-	fileTemp, err := os.CreateTemp("", "pwdTemp.csv")
+	reader := csv.NewReader(file)
+	records, err := reader.ReadAll()
 	if err != nil {
 		return false, err
 	}
 
-	defer fileTemp.Close()
-	defer os.Remove(fileTemp.Name())
-
-	scanner := bufio.NewScanner(file)
-
-	i := 1
-
-	for scanner.Scan() {
-		line := scanner.Text()
-		if i != (key - 1) {
-			_, err = fileTemp.WriteString(line + "\n")
-			if err != nil {
-				return false, err
-			}
-		}
-
-		i++
+	if key < 0 || key >= len(records) {
+		return false, fmt.Errorf("invalid index %d", key)
 	}
 
-	err = scanner.Err()
+	// Remove the row
+	records = append(records[:key], records[key+1:]...)
+
+	// Write to a temporary file
+	tempFile, err := os.CreateTemp("", "pwdTemp_*.csv")
 	if err != nil {
 		return false, err
 	}
+	defer os.Remove(tempFile.Name())
 
-	err = os.Rename(fileTemp.Name(), file.Name())
-	if err != nil {
+	writer := csv.NewWriter(tempFile)
+	if err := writer.WriteAll(records); err != nil {
+		tempFile.Close()
+		return false, err
+	}
+	writer.Flush()
+	tempFile.Close()
+
+	// Replace the original file
+	if err := os.Rename(tempFile.Name(), file.Name()); err != nil {
 		return false, err
 	}
 
 	return true, nil
 }
 
-// Search returns a slice with all the passwords found with the word used for the search.
-// It searches across multiple columns (Name, Username, Email, Password) and is case-insensitive.
-func Search(file *os.File, key string) ([]string, error) {
-	defer file.Close()
-
+// Search looks for passwords matching the query (case-insensitive, substring match).
+func Search(file *os.File, query string) ([]string, error) {
 	reader := csv.NewReader(file)
-
-	pwds := []string{}
-
 	records, err := reader.ReadAll()
 	if err != nil {
 		return nil, err
 	}
 
-	for i, field := range records {
-		if strings.EqualFold(strings.ToLower(key), strings.ToLower(field[0])) ||
-			strings.EqualFold(strings.ToLower(key), strings.ToLower(field[1])) ||
-			strings.EqualFold(strings.ToLower(key), strings.ToLower(field[2])) ||
-			strings.EqualFold(strings.ToLower(key), strings.ToLower(field[3])) {
-			pwds = append(pwds,
-				fmt.Sprintf("[%d] Name: %s Username: %s Email: %s Password: %s",
-					i, field[0], field[1], field[2], field[3]))
+	var results []string
+	q := strings.ToLower(query)
+
+	for i, row := range records {
+		if len(row) < 4 {
+			continue
+		}
+		pwd := Pwd{row[0], row[1], row[2], row[3]}
+		if strings.Contains(strings.ToLower(pwd.Name), q) ||
+			strings.Contains(strings.ToLower(pwd.Username), q) ||
+			strings.Contains(strings.ToLower(pwd.Email), q) ||
+			strings.Contains(strings.ToLower(pwd.Password), q) {
+			results = append(results, formatPwd(i, pwd))
 		}
 	}
 
-	return pwds, nil
+	return results, nil
 }
