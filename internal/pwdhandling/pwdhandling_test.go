@@ -14,14 +14,17 @@ import (
 // helper per creare un file temporaneo e rimuoverlo al termine
 func tempFile(t *testing.T) *os.File {
 	t.Helper()
+
 	file, err := os.CreateTemp("", "pwdhandlingtest.csv")
 	if err != nil {
 		t.Fatalf("cannot create temp file: %v", err)
 	}
+
 	t.Cleanup(func() {
 		file.Close()
 		os.Remove(file.Name())
 	})
+
 	return file
 }
 
@@ -36,6 +39,7 @@ func TestAll(t *testing.T) {
 
 	// Ri-apro il file in lettura
 	file.Close()
+
 	file, err := os.Open(file.Name())
 	if err != nil {
 		t.Fatalf("cannot reopen file: %v", err)
@@ -46,6 +50,7 @@ func TestAll(t *testing.T) {
 	if err != nil {
 		t.Fatalf("All() error: %v", err)
 	}
+
 	if len(got) != 1 {
 		t.Errorf("All() got %d, want %d", len(got), 1)
 	}
@@ -56,12 +61,14 @@ func TestCreate(t *testing.T) {
 	file := tempFile(t)
 
 	pwd := Pwd{"Google", "mr", "mario.rossi@google.com", "1234"}
+
 	if err := Create(file, pwd); err != nil {
 		t.Fatalf("Create() error: %v", err)
 	}
 
 	// Check that it was really written
 	file.Close()
+
 	file, err := os.Open(file.Name())
 	if err != nil {
 		t.Fatalf("cannot reopen file: %v", err)
@@ -72,6 +79,7 @@ func TestCreate(t *testing.T) {
 	if err != nil {
 		t.Fatalf("All() error: %v", err)
 	}
+
 	if len(records) != 1 {
 		t.Errorf("Create() did not write record, got %d, want %d", len(records), 1)
 	}
@@ -82,12 +90,14 @@ func TestDelete(t *testing.T) {
 	file := tempFile(t)
 
 	pwd := Pwd{"Google", "ff", "Fred.Flintstone.@google.com", "1234"}
+
 	if err := Create(file, pwd); err != nil {
 		t.Fatalf("Create() failed: %v", err)
 	}
 
 	// Reopen for delete
 	file.Close()
+
 	file, err := os.Open(file.Name())
 	if err != nil {
 		t.Fatalf("cannot reopen file: %v", err)
@@ -98,6 +108,7 @@ func TestDelete(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Delete() error: %v", err)
 	}
+
 	if !got {
 		t.Errorf("Delete() got %t, want %t", got, true)
 	}
@@ -114,16 +125,19 @@ func TestSearch(t *testing.T) {
 
 	// Reopen for search
 	file.Close()
+
 	file, err := os.Open(file.Name())
 	if err != nil {
 		t.Fatalf("cannot reopen file: %v", err)
 	}
+
 	defer file.Close()
 
 	got, err := Search(file, "ff")
 	if err != nil {
 		t.Fatalf("Search() error: %v", err)
 	}
+
 	if len(got) < 1 {
 		t.Errorf("Search() got %d, want at least %d", len(got), 1)
 	}

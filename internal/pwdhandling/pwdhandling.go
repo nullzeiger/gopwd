@@ -13,6 +13,8 @@ import (
 	"strings"
 )
 
+const FieldNumber = 4
+
 // Pwd represents a single password entry.
 type Pwd struct {
 	Name, Username, Email, Password string
@@ -27,6 +29,7 @@ func formatPwd(index int, p Pwd) string {
 // All returns a slice of strings containing all the passwords.
 func All(file *os.File) ([]string, error) {
 	reader := csv.NewReader(file)
+
 	records, err := reader.ReadAll()
 	if err != nil {
 		return nil, err
@@ -34,9 +37,10 @@ func All(file *os.File) ([]string, error) {
 
 	pwds := make([]string, 0, len(records))
 	for i, item := range records {
-		if len(item) < 4 {
+		if len(item) < FieldNumber {
 			continue // skip malformed rows
 		}
+
 		pwd := Pwd{item[0], item[1], item[2], item[3]}
 		pwds = append(pwds, formatPwd(i, pwd))
 	}
@@ -53,12 +57,14 @@ func Create(file *os.File, pwd Pwd) error {
 	if err := writer.Write(record); err != nil {
 		return err
 	}
+
 	return nil
 }
 
 // Delete removes a row by index and rewrites the file.
 func Delete(file *os.File, key int) (bool, error) {
 	reader := csv.NewReader(file)
+
 	records, err := reader.ReadAll()
 	if err != nil {
 		return false, err
@@ -83,6 +89,7 @@ func Delete(file *os.File, key int) (bool, error) {
 		tempFile.Close()
 		return false, err
 	}
+
 	writer.Flush()
 	tempFile.Close()
 
@@ -97,18 +104,21 @@ func Delete(file *os.File, key int) (bool, error) {
 // Search looks for passwords matching the query (case-insensitive, substring match).
 func Search(file *os.File, query string) ([]string, error) {
 	reader := csv.NewReader(file)
+
 	records, err := reader.ReadAll()
 	if err != nil {
 		return nil, err
 	}
 
 	var results []string
+
 	q := strings.ToLower(query)
 
 	for i, row := range records {
-		if len(row) < 4 {
+		if len(row) < FieldNumber {
 			continue
 		}
+
 		pwd := Pwd{row[0], row[1], row[2], row[3]}
 		if strings.Contains(strings.ToLower(pwd.Name), q) ||
 			strings.Contains(strings.ToLower(pwd.Username), q) ||

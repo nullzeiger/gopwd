@@ -67,6 +67,7 @@ func getHomeDir() string {
 	if err != nil {
 		panic("unable to determine user home directory: " + err.Error())
 	}
+
 	return home
 }
 
@@ -74,4 +75,3 @@ func getHomeDir() string {
 func fullPath(name string) string {
 	return filepath.Join(getHomeDir(), name)
 }
-
