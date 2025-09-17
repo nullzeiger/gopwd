@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 )
 
+// File permission
 const filePerm = 0o644
 
 // Create ensures the file exists in the user's home directory.

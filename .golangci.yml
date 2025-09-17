@@ -39,6 +39,7 @@ linters:
             - $gostd
             - github.com/nullzeiger/gopwd/internal/filehandling
             - github.com/nullzeiger/gopwd/internal/pwdhandling
+            - github.com/nullzeiger/gopwd/internal/commands
     errcheck:
       check-type-assertions: true
     goconst:
